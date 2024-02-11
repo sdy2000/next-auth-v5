@@ -1,12 +1,37 @@
 "use server";
 
-import { RegisterSchema } from "@/schemas";
 import * as z from "zod";
+import bcryptjs from "bcryptjs";
+
+import { RegisterSchema } from "@/schemas";
+import { getUserByEmail } from "@/data/user";
+import { db } from "@/lib/db";
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
-  const validateFields = RegisterSchema.safeParse(values); // sever validate for more security
+  const validateFields = RegisterSchema.safeParse(values);
 
-  if (!validateFields.success) return { error: "Invalid fields!" };
+  if (!validateFields.success) return { error: "Invalid fields!" }; // sever validate for more security
 
-  return { success: "Email sent!" };
+  const { name, email, password, confirmPassword } = validateFields.data;
+
+  if (password !== confirmPassword)
+    return { error: "Passwords does not match" }; // return error if pass not match
+
+  const hashedPassword = await bcryptjs.hash(password, 10); // hash password
+
+  const existingUser = await getUserByEmail(email);
+
+  if (existingUser) return { error: "Email already in use!" }; // return error if same email exist
+
+  await db.user.create({
+    data: {
+      name,
+      email,
+      password: hashedPassword,
+    },
+  });
+
+  // TODO :  Send verification token email
+
+  return { success: "User created!" };
 };
