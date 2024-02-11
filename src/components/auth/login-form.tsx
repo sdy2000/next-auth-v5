@@ -2,6 +2,7 @@
 
 import * as z from "zod";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema } from "@/schemas";
@@ -17,9 +18,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { CardWrapper } from "./card-wrapper";
+import { CardWrapper } from ".";
+import { FormError, FormSuccess } from "@/components";
 
 export const LoginForm = () => {
+  const [error, setError] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -78,6 +82,8 @@ export const LoginForm = () => {
               )}
             />
           </div>
+          <FormError message={error} />
+          <FormSuccess message={success} />
           <Button type="submit" className="w-full">
             Login
           </Button>
