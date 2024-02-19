@@ -7,7 +7,7 @@ export const generateVerificationToken = async (email: string) => {
   const token = uuidv4();
   const expires = new Date(new Date().getTime() + 3600 * 1000);
 
-  deleteVerificationToken(email);
+  await deleteVerificationToken(email);
 
   const verificationToken = await db.verificationToken.create({
     data: {

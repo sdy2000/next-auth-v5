@@ -36,11 +36,11 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
   //   verificationToken.token
   // );
 
-  const isSendVerificationEmail: boolean = true;
+  const isSendVerificationEmail: boolean = true; //! Delete this line after fix above bug
 
   // Check Email sended or not
   if (!isSendVerificationEmail) {
-    deleteVerificationToken(email);
+    await deleteVerificationToken(email);
 
     return { error: "Something went wrong!" };
   }
@@ -50,7 +50,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
       name,
       email,
       password: hashedPassword,
-      emailVerified: new Date(),
+      emailVerified: new Date(), //! Delete this line after fix above bug
     },
   });
 

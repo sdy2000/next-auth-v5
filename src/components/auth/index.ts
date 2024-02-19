@@ -1,6 +1,7 @@
 export * from "./login-form";
 export * from "./register-form";
 export * from "./error-card";
+export * from "./new-verification-form";
 
 export * from "./login-button";
 export * from "./back-button";
