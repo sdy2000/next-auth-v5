@@ -6,7 +6,11 @@ import bcryptjs from "bcryptjs";
 import { db } from "@/lib/db";
 import { RegisterSchema } from "@/schemas";
 import { getUserByEmail } from "@/data/user";
-import { generateVerificationToken } from "@/lib/tokens";
+import {
+  deleteVerificationToken,
+  generateVerificationToken,
+} from "@/lib/tokens";
+import { sendVerificationEmail } from "@/lib/mail";
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
   const validateFields = RegisterSchema.safeParse(values);
@@ -24,17 +28,31 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
 
   if (existingUser) return { error: "Email already in use!" }; // return error if same email exist
 
+  const verificationToken = await generateVerificationToken(email);
+
+  // TODO: Fix email sender
+  // const isSendVerificationEmail: boolean = await sendVerificationEmail(
+  //   verificationToken.email,
+  //   verificationToken.token
+  // );
+
+  const isSendVerificationEmail: boolean = true;
+
+  // Check Email sended or not
+  if (!isSendVerificationEmail) {
+    deleteVerificationToken(email);
+
+    return { error: "Something went wrong!" };
+  }
+
   await db.user.create({
     data: {
       name,
       email,
       password: hashedPassword,
+      emailVerified: new Date(),
     },
   });
-
-  const verificationToken = await generateVerificationToken(email);
-
-  // TODO :  Send verification token email
 
   return { success: "Confirmation email sent!" };
 };
