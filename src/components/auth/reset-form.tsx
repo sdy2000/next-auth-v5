@@ -2,10 +2,8 @@
 
 import * as z from "zod";
 
-import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useState, useTransition } from "react";
-import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema } from "@/schemas";
 
@@ -20,18 +18,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { login } from "@/actions/login";
-
 import { CardWrapper } from ".";
+import { login } from "@/actions/login";
 import { FormError, FormSuccess } from "@/components";
 
-export const LoginForm = () => {
-  const searchParams = useSearchParams();
-  const urlError =
-    searchParams.get("error") === "OAuthAccountNotLinked"
-      ? "Email already in use with different provider!"
-      : "";
-
+export const ResetForm = () => {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
@@ -64,10 +55,9 @@ export const LoginForm = () => {
 
   return (
     <CardWrapper
-      headerLabel="Welcome back"
-      backButtonLabel="Don't have an account?"
-      backButtonHref="/auth/register"
-      showSocial
+      headerLabel="Forgot your password?"
+      backButtonLabel="Back to login"
+      backButtonHref="/auth/login"
     >
       <Form {...form}>
         <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
@@ -90,39 +80,11 @@ export const LoginForm = () => {
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      disabled={isPending}
-                      placeholder="*********"
-                      type="password"
-                      hasIcon={true}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              size="sm"
-              variant="link"
-              asChild
-              className="px-0 font-normal"
-            >
-              <Link href="/auth/reset">Forgot password?</Link>
-            </Button>
           </div>
-          <FormError message={error || urlError} />
+          <FormError message={error} />
           <FormSuccess message={success} />
           <Button disabled={isPending} type="submit" className="w-full">
-            Login
+            Send reset email
           </Button>
         </form>
       </Form>

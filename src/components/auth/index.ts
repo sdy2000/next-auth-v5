@@ -1,11 +1,12 @@
 export * from "./login-form";
-export * from "./register-form";
 export * from "./error-card";
+export * from "./register-form";
+export * from "./reset-form";
 export * from "./new-verification-form";
 
-export * from "./login-button";
-export * from "./back-button";
 export * from "./social";
+export * from "./back-button";
+export * from "./login-button";
 
-export * from "./card-wrapper";
 export * from "./header";
+export * from "./card-wrapper";
