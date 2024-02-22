@@ -3,6 +3,7 @@ export * from "./error-card";
 export * from "./register-form";
 export * from "./reset-form";
 export * from "./new-verification-form";
+export * from "./new-password-form";
 
 export * from "./social";
 export * from "./back-button";
