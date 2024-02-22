@@ -7,15 +7,25 @@ import { signIn } from "@/auth";
 import { LoginSchema } from "@/schemas";
 import { getUserByEmail } from "@/data/user";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
-import { sendVerificationEmail } from "@/lib/mail";
-import { generateVerificationToken } from "@/lib/tokens";
+import { getTwoFactorTokenByEmail } from "@/data/two-factor-token";
+import { sendTwoFactorTokenEmail, sendVerificationEmail } from "@/lib/mail";
+import {
+  deleteTwoFactorToken,
+  generateTwoFactorToken,
+  generateVerificationToken,
+} from "@/lib/tokens";
+import {
+  createTwoFactorConfirmationByUserId,
+  deleteTwoFactorConfirmationByUserId,
+  getTwoFactorConfirmationByUserId,
+} from "@/data/two-factor-confirmation";
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
   const validateFields = LoginSchema.safeParse(values); // sever validate for more security
 
   if (!validateFields.success) return { error: "Invalid fields!" };
 
-  const { email, password } = validateFields.data;
+  const { email, password, code } = validateFields.data;
 
   const existingUser = await getUserByEmail(email); // get user by email if exist
 
@@ -33,6 +43,43 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     );
 
     return { success: "Confirmation email sent!" };
+  }
+
+  if (existingUser.isTwoFactorEnabled && existingUser.email) {
+    if (code) {
+      const twoFactorToken = await getTwoFactorTokenByEmail(existingUser.email);
+
+      if (!twoFactorToken) return { error: "Invalid code!" };
+      if (twoFactorToken.token !== code)
+        return { error: "Invalid entered code!" };
+
+      const hasExpired = new Date(twoFactorToken.expires) < new Date();
+
+      if (hasExpired) return { error: "Code expired!" };
+
+      await deleteTwoFactorToken(twoFactorToken.email);
+
+      const existingConfirmation = await getTwoFactorConfirmationByUserId(
+        existingUser.id
+      );
+      if (existingConfirmation)
+        await deleteTwoFactorConfirmationByUserId(existingUser.id);
+
+      const isCreateTwoFactorConfirmation =
+        await createTwoFactorConfirmationByUserId(existingUser.id);
+      if (!isCreateTwoFactorConfirmation) return { error: "Server problem!" };
+    } else {
+      const twoFactorToken = await generateTwoFactorToken(existingUser.email);
+      // TODO: Fix email sender bug
+      // const isSendTwoFactorToken = await sendTwoFactorTokenEmail(
+      //   twoFactorToken.email,
+      //   twoFactorToken.token
+      // );
+      // if (!isSendTwoFactorToken)
+      //   return { error: "Server problem, We can't send two factor email!" };
+
+      return { twoFactor: true };
+    }
   }
 
   try {

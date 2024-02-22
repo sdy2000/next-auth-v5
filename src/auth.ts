@@ -5,6 +5,10 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/db";
 import authConfig from "@/auth.config";
 import { getUserById } from "@/data/user";
+import {
+  deleteTwoFactorConfirmationByUserId,
+  getTwoFactorConfirmationByUserId,
+} from "@/data/two-factor-confirmation";
 
 declare module "next-auth" {
   // Add role Field in session(user)
@@ -41,7 +45,17 @@ export const {
       // Prevent sing in without email verification
       if (!existingUser?.emailVerified) return false;
 
-      // TODO: Add 2FA check
+      // Check user 2FA
+      if (existingUser.isTwoFactorEnabled) {
+        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
+          existingUser.id
+        );
+
+        if (!twoFactorConfirmation) return false;
+
+        // Delete two factor confirmation for next sign in
+        await deleteTwoFactorConfirmationByUserId(twoFactorConfirmation.id);
+      }
 
       return true;
     },
