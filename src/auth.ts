@@ -13,7 +13,11 @@ import {
 declare module "next-auth" {
   // Add role Field in session(user)
   interface Session {
-    user: DefaultSession["user"] & { role: UserRole };
+    user: DefaultSession["user"] & {
+      role: UserRole;
+      isTwoFactorEnabled: boolean;
+      isOAuth: boolean;
+    };
   }
 }
 
