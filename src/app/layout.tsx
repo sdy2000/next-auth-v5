@@ -1,3 +1,4 @@
+import { Toaster } from "sonner";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
@@ -32,7 +33,7 @@ export default async function RootLayout({
             disableTransitionOnChange
             storageKey="next-auth-v5"
           >
-            {children}
+            <Toaster /> {children}
           </ThemeProvider>
         </body>
       </html>

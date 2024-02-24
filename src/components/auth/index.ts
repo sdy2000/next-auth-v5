@@ -13,3 +13,4 @@ export * from "./user-button";
 
 export * from "./header";
 export * from "./card-wrapper";
+export * from "./role-gate";

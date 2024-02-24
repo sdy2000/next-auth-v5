@@ -71,6 +71,10 @@ export const {
       if (token.role && session.user)
         session.user.role = token.role as UserRole;
 
+      // Add user isTwoFactorEnabled in session
+      if (session.user)
+        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
+
       return session;
     },
     async jwt({ token }) {
@@ -80,6 +84,7 @@ export const {
       if (!existingUser) return token; // if user doesn't exist return token
 
       token.role = existingUser.role;
+      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
 
       return token;
     },

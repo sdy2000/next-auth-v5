@@ -1,4 +1,11 @@
+"use client";
+
+import { UserInfo } from "@/components";
+import { useCurrentUser } from "@/hooks/use-current-user";
+
 const ClientPage = () => {
-  return <div>ClientPage</div>;
+  const user = useCurrentUser();
+
+  return <UserInfo label="📱 Client component" user={user} />;
 };
 export default ClientPage;
