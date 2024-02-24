@@ -8,6 +8,8 @@ export * from "./new-password-form";
 export * from "./social";
 export * from "./back-button";
 export * from "./login-button";
+export * from "./logout-button";
+export * from "./user-button";
 
 export * from "./header";
 export * from "./card-wrapper";

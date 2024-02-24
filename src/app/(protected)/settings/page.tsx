@@ -1,23 +1,23 @@
-import { auth, signOut } from "@/auth";
+"use client";
+
 import { buttonVariants } from "@/components/ui/button";
 
-const SettingPage = async () => {
-  const session = await auth();
+import { logout } from "@/actions/logout";
+import { useCurrentUser } from "@/hooks/use-current-user";
+
+const SettingPage = () => {
+  const user = useCurrentUser();
 
   return (
     <div>
-      {JSON.stringify(session)}
-      <form
-        action={async () => {
-          "use server";
-
-          await signOut();
-        }}
+      {JSON.stringify(user)}
+      <button
+        onClick={() => logout()}
+        type="submit"
+        className={buttonVariants()}
       >
-        <button type="submit" className={buttonVariants()}>
-          Sing out
-        </button>
-      </form>
+        Sing out
+      </button>
     </div>
   );
 };
